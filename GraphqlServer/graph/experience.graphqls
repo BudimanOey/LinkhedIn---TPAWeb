@@ -1,0 +1,34 @@
+type Experience {
+    ID: ID!
+    userID: String!
+    title: String!
+    employmentType: String!
+    company: String!
+    location: String!
+    startDate: String!
+    endDate: String!
+    description: String!
+    currentlyWorking: Boolean!
+}
+
+input NewExperience {
+    userID: String!
+    title: String!
+    employmentType: String!
+    company: String!
+    location: String!
+    startDate: String!
+    endDate: String!
+    description: String!
+    currentlyWorking: Boolean!
+}
+
+extend type Query {
+    getExperience(userID: String!): [Experience!]!
+}
+
+extend type Mutation {
+    addExperience(input: NewExperience): String!
+    updateExperience(ID: String!, input: NewExperience): String!
+    removeExperience(ID: String!): String!
+}

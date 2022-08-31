@@ -1,0 +1,13 @@
+
+type invitation {
+    id: ID!
+    userID: String!
+}
+
+extend type Query{
+    getActivation(id: ID!): invitation!
+}
+
+extend type Mutation{
+    generateActivation(userID: String!): String!
+}

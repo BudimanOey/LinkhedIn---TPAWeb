@@ -1,0 +1,78 @@
+$blue : #1e94f5;
+
+.body{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+}
+
+.imgContainer {
+    width: 100%;
+    height: 20%;
+}
+
+.imgLogo{
+    padding: 50px;
+    width: 150px;
+}
+
+
+.inputBox{
+    padding: 10px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.formContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    margin: 0 10px 0 10px;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    justify-content: center;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    box-shadow: 5px 10px 18px grey;
+    margin: 10px;
+    padding: 20px;
+}
+
+.signIn{
+    color: black;
+    font-size: 35px;
+    font-style: bold;
+    margin: 10px;
+}
+
+.button{
+    width: 100%;
+    color: whitesmoke;
+    border-radius: 35px;
+    background-color: $blue;
+    margin-top: 20px;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+.button:hover{
+    background-color: cadetblue;
+}
+
+.errorMsg{
+    color: red;
+}
+
+.spliter{
+    text-align: center;
+}
