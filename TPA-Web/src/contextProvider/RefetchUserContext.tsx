@@ -7,23 +7,28 @@ import { UserContext } from "./userContext";
 export const RefetchUser = createContext(null as any);
 
 export default function RefetchUserProvider({children}:any){
-    const userContext = useContext(UserContext).user
+    const {user, setUser} = useContext(UserContext)
     const {loading, error, data, refetch} = useQuery(GET_USER_BY_ID, {
         variables: {
-            id: userContext.id
+            id: user.id
         }
     })
 
+    // console.log(user.token)
+
     function refetchUserData(){
         refetch().then((e)=>{
-            console.log(e)
+            const newUser = {...e.data.getUserByID, token: user.token}
+            console.log(newUser)
+            setUser(newUser)
+            console.log(user)
+            // setUser(newUser)
         })
     }
 
     return(
-        <RefetchUser.Provider value={refetchUserData}>
+        <RefetchUser.Provider value={{refetchUserData}}>
             {children}
         </RefetchUser.Provider>
     )
 }
-

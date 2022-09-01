@@ -31,6 +31,11 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser
 		Email:     input.Email,
 		Password:  helper.HashPassword(input.Password),
 		Activated: false,
+		ConnectRequest: []string{},
+		RequestConnectTo: []string{},
+		ConnectedUser: []string{},
+		FollowedUser: []string{},
+
 	}
 
 	if err := r.DB.Model(user).Create(user).Error; err != nil {
@@ -67,15 +72,16 @@ func (r *mutationResolver) LoginUser(ctx context.Context, email string, password
 	}
 
 	return map[string]interface{}{
-		"id":         user.ID,
-		"token":      token,
-		"name":       user.FirstName + " " + user.LastName,
-		"email":      user.Email,
-		"profilePic": user.ProfilePicture,
-		"activated":  user.Activated,
-		"connectRequest": user.ConnectRequest,
-		"connectedUser": user.ConnectedUser,
-		"followedUser": user.FollowedUser,
+		"id":               user.ID,
+		"token":            token,
+		"name":             user.FirstName + " " + user.LastName,
+		"email":            user.Email,
+		"profilePic":       user.ProfilePicture,
+		"activated":        user.Activated,
+		"connectRequest":   user.ConnectRequest,
+		"requestConnectTo": user.RequestConnectTo,
+		"connectedUser":    user.ConnectedUser,
+		"followedUser":     user.FollowedUser,
 	}, nil
 }
 
@@ -111,7 +117,25 @@ func (r *mutationResolver) ConnectionRequest(ctx context.Context, userID string,
 	}
 
 	user.ConnectRequest = append(user.ConnectRequest, userID)
+	_,err := r.RequestConnectTo(ctx, userID, recepient)
+	
+	if err != nil {
+		return "error", nil
+	}
+
 	return "Connection request has been sent!", r.DB.Save(user).Error
+}
+
+// RequestConnectTo is the resolver for the requestConnectTo field.
+func (r *mutationResolver) RequestConnectTo(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	user.RequestConnectTo = append(user.RequestConnectTo, recepient)
+
+	return "Success", r.DB.Save(user).Error
 }
 
 // AcceptConnection is the resolver for the acceptConnection field.
@@ -148,8 +172,14 @@ func (r *mutationResolver) AcceptConnection(ctx context.Context, userID string, 
 
 	_, err := r.RemoveConnectRequest(ctx, userID, sender)
 
+	_, err2 := r.RemoveRequestConnectTo(ctx, sender, userID)
+
 	if err != nil {
 		return "Error while remove req connect !", err
+	}
+
+	if err2 != nil {
+		return "error", nil
 	}
 
 	return "Success", nil
@@ -176,6 +206,30 @@ func (r *mutationResolver) RemoveConnectRequest(ctx context.Context, userID stri
 		}
 	}
 	user.ConnectRequest = newArrReq
+	return "Success", r.DB.Save(user).Error
+}
+
+// RemoveRequestConnectTo is the resolver for the removeRequestConnectTo field.
+func (r *mutationResolver) RemoveRequestConnectTo(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	arrLen := (len(user.RequestConnectTo) - 1)
+	newArrReq := make([]string, arrLen)
+	k := 0
+	for i := 0; i < arrLen; {
+		if user.RequestConnectTo[i] != recepient {
+			newArrReq[i] = user.RequestConnectTo[k]
+			k++
+			i++
+		} else {
+			k++
+		}
+	}
+	user.RequestConnectTo = newArrReq
 	return "Success", r.DB.Save(user).Error
 }
 
@@ -207,6 +261,11 @@ func (r *queryResolver) TestMiddleware(ctx context.Context) (string, error) {
 // ConnectRequest is the resolver for the connectRequest field.
 func (r *userResolver) ConnectRequest(ctx context.Context, obj *model.User) ([]string, error) {
 	return obj.ConnectRequest, nil
+}
+
+// RequestConnectTo is the resolver for the requestConnectTo field.
+func (r *userResolver) RequestConnectTo(ctx context.Context, obj *model.User) ([]string, error) {
+	return obj.RequestConnectTo, nil
 }
 
 // ConnectedUser is the resolver for the connectedUser field.

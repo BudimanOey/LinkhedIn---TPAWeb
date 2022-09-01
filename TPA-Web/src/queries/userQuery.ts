@@ -50,6 +50,7 @@ export const GET_USER_BY_ID = gql`
       profilePicture,
       activated,
       connectRequest,
+      requestConnectTo,
       connectedUser,
       followedUser
     }
@@ -79,5 +80,11 @@ export const UPDATE_PROFILE_PICTURE = gql`
 export const REQUEST_CONNECT = gql`
   mutation reqConn($userID: String!, $recepient: String!){
     connectionRequest(userID: $userID, recepient: $recepient)
+  }
+`
+
+export const ACCEPT_CONNECT = gql`
+  mutation acceptConnection($userID: String!, $sender: String!){
+    acceptConnection(userID: $userID, sender:$sender)
   }
 `

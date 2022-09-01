@@ -15,6 +15,7 @@ type User {
   activated: Boolean!
   profilePicture: String!
   connectRequest: [String!]!
+  requestConnectTo: [String!]!
   connectedUser: [String!]!
   followedUser: [String!]!
 }
@@ -33,8 +34,10 @@ type Mutation {
   updateProfileImage(id: String!, imgURL: String!): String!
   updateUserPassword(id: String!, newPass: String!): String!
   connectionRequest(userID: String!, recepient:String!): String!
+  requestConnectTo(userID: String!, recepient:String!): String!
   acceptConnection(userID: String!, sender:String!): String!
   removeConnectRequest(userID: String!, sender:String!): String!
+  removeRequestConnectTo(userID: String!, recepient: String!): String!
 }
 
 input NewUser {

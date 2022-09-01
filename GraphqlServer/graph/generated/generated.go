@@ -72,22 +72,24 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AcceptConnection      func(childComplexity int, userID string, sender string) int
-		ActivateUser          func(childComplexity int, id string) int
-		AddEducation          func(childComplexity int, input *model.NewEducation) int
-		AddExperience         func(childComplexity int, input *model.NewExperience) int
-		ConnectionRequest     func(childComplexity int, userID string, recepient string) int
-		GenerateActivation    func(childComplexity int, userID string) int
-		GenerateResetPassLink func(childComplexity int, userID string, email string) int
-		LoginUser             func(childComplexity int, email string, password string) int
-		RegisterUser          func(childComplexity int, input model.NewUser) int
-		RemoveConnectRequest  func(childComplexity int, userID string, sender string) int
-		RemoveEducation       func(childComplexity int, id string) int
-		RemoveExperience      func(childComplexity int, id string) int
-		UpdateEducation       func(childComplexity int, id string, input *model.NewEducation) int
-		UpdateExperience      func(childComplexity int, id string, input *model.NewExperience) int
-		UpdateProfileImage    func(childComplexity int, id string, imgURL string) int
-		UpdateUserPassword    func(childComplexity int, id string, newPass string) int
+		AcceptConnection       func(childComplexity int, userID string, sender string) int
+		ActivateUser           func(childComplexity int, id string) int
+		AddEducation           func(childComplexity int, input *model.NewEducation) int
+		AddExperience          func(childComplexity int, input *model.NewExperience) int
+		ConnectionRequest      func(childComplexity int, userID string, recepient string) int
+		GenerateActivation     func(childComplexity int, userID string) int
+		GenerateResetPassLink  func(childComplexity int, userID string, email string) int
+		LoginUser              func(childComplexity int, email string, password string) int
+		RegisterUser           func(childComplexity int, input model.NewUser) int
+		RemoveConnectRequest   func(childComplexity int, userID string, sender string) int
+		RemoveEducation        func(childComplexity int, id string) int
+		RemoveExperience       func(childComplexity int, id string) int
+		RemoveRequestConnectTo func(childComplexity int, userID string, recepient string) int
+		RequestConnectTo       func(childComplexity int, userID string, recepient string) int
+		UpdateEducation        func(childComplexity int, id string, input *model.NewEducation) int
+		UpdateExperience       func(childComplexity int, id string, input *model.NewExperience) int
+		UpdateProfileImage     func(childComplexity int, id string, imgURL string) int
+		UpdateUserPassword     func(childComplexity int, id string, newPass string) int
 	}
 
 	Query struct {
@@ -106,16 +108,17 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Activated      func(childComplexity int) int
-		ConnectRequest func(childComplexity int) int
-		ConnectedUser  func(childComplexity int) int
-		Email          func(childComplexity int) int
-		FirstName      func(childComplexity int) int
-		FollowedUser   func(childComplexity int) int
-		ID             func(childComplexity int) int
-		LastName       func(childComplexity int) int
-		Password       func(childComplexity int) int
-		ProfilePicture func(childComplexity int) int
+		Activated        func(childComplexity int) int
+		ConnectRequest   func(childComplexity int) int
+		ConnectedUser    func(childComplexity int) int
+		Email            func(childComplexity int) int
+		FirstName        func(childComplexity int) int
+		FollowedUser     func(childComplexity int) int
+		ID               func(childComplexity int) int
+		LastName         func(childComplexity int) int
+		Password         func(childComplexity int) int
+		ProfilePicture   func(childComplexity int) int
+		RequestConnectTo func(childComplexity int) int
 	}
 
 	Invitation struct {
@@ -131,8 +134,10 @@ type MutationResolver interface {
 	UpdateProfileImage(ctx context.Context, id string, imgURL string) (string, error)
 	UpdateUserPassword(ctx context.Context, id string, newPass string) (string, error)
 	ConnectionRequest(ctx context.Context, userID string, recepient string) (string, error)
+	RequestConnectTo(ctx context.Context, userID string, recepient string) (string, error)
 	AcceptConnection(ctx context.Context, userID string, sender string) (string, error)
 	RemoveConnectRequest(ctx context.Context, userID string, sender string) (string, error)
+	RemoveRequestConnectTo(ctx context.Context, userID string, recepient string) (string, error)
 	GenerateActivation(ctx context.Context, userID string) (string, error)
 	AddEducation(ctx context.Context, input *model.NewEducation) (*model.Education, error)
 	UpdateEducation(ctx context.Context, id string, input *model.NewEducation) (string, error)
@@ -153,6 +158,7 @@ type QueryResolver interface {
 }
 type UserResolver interface {
 	ConnectRequest(ctx context.Context, obj *model.User) ([]string, error)
+	RequestConnectTo(ctx context.Context, obj *model.User) ([]string, error)
 	ConnectedUser(ctx context.Context, obj *model.User) ([]string, error)
 	FollowedUser(ctx context.Context, obj *model.User) ([]string, error)
 }
@@ -449,6 +455,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RemoveExperience(childComplexity, args["ID"].(string)), true
 
+	case "Mutation.removeRequestConnectTo":
+		if e.complexity.Mutation.RemoveRequestConnectTo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeRequestConnectTo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveRequestConnectTo(childComplexity, args["userID"].(string), args["recepient"].(string)), true
+
+	case "Mutation.requestConnectTo":
+		if e.complexity.Mutation.RequestConnectTo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_requestConnectTo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RequestConnectTo(childComplexity, args["userID"].(string), args["recepient"].(string)), true
+
 	case "Mutation.updateEducation":
 		if e.complexity.Mutation.UpdateEducation == nil {
 			break
@@ -660,6 +690,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ProfilePicture(childComplexity), true
 
+	case "User.requestConnectTo":
+		if e.complexity.User.RequestConnectTo == nil {
+			break
+		}
+
+		return e.complexity.User.RequestConnectTo(childComplexity), true
+
 	case "invitation.id":
 		if e.complexity.Invitation.ID == nil {
 			break
@@ -853,6 +890,7 @@ type User {
   activated: Boolean!
   profilePicture: String!
   connectRequest: [String!]!
+  requestConnectTo: [String!]!
   connectedUser: [String!]!
   followedUser: [String!]!
 }
@@ -871,8 +909,10 @@ type Mutation {
   updateProfileImage(id: String!, imgURL: String!): String!
   updateUserPassword(id: String!, newPass: String!): String!
   connectionRequest(userID: String!, recepient:String!): String!
+  requestConnectTo(userID: String!, recepient:String!): String!
   acceptConnection(userID: String!, sender:String!): String!
   removeConnectRequest(userID: String!, sender:String!): String!
+  removeRequestConnectTo(userID: String!, recepient: String!): String!
 }
 
 input NewUser {
@@ -1112,6 +1152,54 @@ func (ec *executionContext) field_Mutation_removeExperience_args(ctx context.Con
 		}
 	}
 	args["ID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeRequestConnectTo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["userID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["recepient"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recepient"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["recepient"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_requestConnectTo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["userID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["recepient"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recepient"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["recepient"] = arg1
 	return args, nil
 }
 
@@ -2520,6 +2608,61 @@ func (ec *executionContext) fieldContext_Mutation_connectionRequest(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_requestConnectTo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_requestConnectTo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RequestConnectTo(rctx, fc.Args["userID"].(string), fc.Args["recepient"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_requestConnectTo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_requestConnectTo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_acceptConnection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_acceptConnection(ctx, field)
 	if err != nil {
@@ -2624,6 +2767,61 @@ func (ec *executionContext) fieldContext_Mutation_removeConnectRequest(ctx conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_removeConnectRequest_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeRequestConnectTo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_removeRequestConnectTo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RemoveRequestConnectTo(rctx, fc.Args["userID"].(string), fc.Args["recepient"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_removeRequestConnectTo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeRequestConnectTo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3145,6 +3343,8 @@ func (ec *executionContext) fieldContext_Query_getUserByEmail(ctx context.Contex
 				return ec.fieldContext_User_profilePicture(ctx, field)
 			case "connectRequest":
 				return ec.fieldContext_User_connectRequest(ctx, field)
+			case "requestConnectTo":
+				return ec.fieldContext_User_requestConnectTo(ctx, field)
 			case "connectedUser":
 				return ec.fieldContext_User_connectedUser(ctx, field)
 			case "followedUser":
@@ -3222,6 +3422,8 @@ func (ec *executionContext) fieldContext_Query_getUserByID(ctx context.Context, 
 				return ec.fieldContext_User_profilePicture(ctx, field)
 			case "connectRequest":
 				return ec.fieldContext_User_connectRequest(ctx, field)
+			case "requestConnectTo":
+				return ec.fieldContext_User_requestConnectTo(ctx, field)
 			case "connectedUser":
 				return ec.fieldContext_User_connectedUser(ctx, field)
 			case "followedUser":
@@ -4139,6 +4341,50 @@ func (ec *executionContext) _User_connectRequest(ctx context.Context, field grap
 }
 
 func (ec *executionContext) fieldContext_User_connectRequest(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_requestConnectTo(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_requestConnectTo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().RequestConnectTo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_requestConnectTo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -6584,6 +6830,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "requestConnectTo":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_requestConnectTo(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "acceptConnection":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6597,6 +6852,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_removeConnectRequest(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "removeRequestConnectTo":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeRequestConnectTo(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -6992,6 +7256,26 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_connectRequest(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "requestConnectTo":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_requestConnectTo(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

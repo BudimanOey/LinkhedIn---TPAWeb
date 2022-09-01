@@ -50,13 +50,6 @@ type NewExperience struct {
 	CurrentlyWorking bool   `json:"currentlyWorking"`
 }
 
-type NewUser struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-}
-
 type ResetPassLink struct {
 	ID     string `json:"id"`
 	UserID string `json:"userID"`

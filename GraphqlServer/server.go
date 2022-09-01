@@ -47,7 +47,7 @@ func main() {
 		port = defaultPort
 	}
 
-	dsn := "host=localhost user=postgres password=Cingkotuy215 dbname=tpa-web port=5342 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=localhost user=postgres password=Cingkotuy215 dbname=tpa-web port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {

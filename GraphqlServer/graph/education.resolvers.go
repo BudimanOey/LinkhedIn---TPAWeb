@@ -42,7 +42,7 @@ func (r *mutationResolver) UpdateEducation(ctx context.Context, id string, input
 	education.Description = input.Description
 	education.Grade = input.Grade
 	education.EndDate = input.EndDate
-	
+
 	return "success", r.DB.Save(education).Error
 }
 

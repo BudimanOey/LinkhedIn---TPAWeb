@@ -13,15 +13,14 @@ import EducationModal from '../components/modals/EducationModal';
 import Experience from '../components/Experience/Experience';
 import AddExperienceModal from '../components/modals/AddExperienceModal'; 
 import defaultProfile from '../assets/profile.jpg'
-import { AiFillDelete } from 'react-icons/ai';
+import { BiLogOut } from "react-icons/bi";
 import UpdateExperience from '../components/modals/UpdateExperience';
 import { RefetchUser } from '../contextProvider/RefetchUserContext';
 
 
 export default function ProfilePage() {
-    const user = useContext(UserContext).user;
-    const setUser = useContext(UserContext).setUser;
-    const refetchUser = useContext(RefetchUser);
+    const {user, setUser} = useContext(UserContext)
+    const refetchUser = useContext(RefetchUser).refetchUserData;
     const {id} = useParams();
     const [updateProfilePic] = useMutation(UPDATE_PROFILE_PICTURE);
     const [requestFollow] = useMutation(REQUEST_CONNECT);
@@ -36,8 +35,6 @@ export default function ProfilePage() {
             id: id
         }
     })
-    
-    console.log(data)
 
     async function uploadImgButtonHandler(e:any){
         const uploadImg = (e.target.files as FileList)[0] as File
@@ -70,11 +67,14 @@ export default function ProfilePage() {
                 recepient: id
             }
         }).then(()=>{
-            refetchUser()
+            refetchUser();
             alert("Request sent!");
         })
     }
     
+    function logoutButtonHandler(){
+        setUser({})
+    }
 
     if(loading){
         return(
@@ -88,7 +88,9 @@ export default function ProfilePage() {
             <NotFoundPage/>
         )
     }
-    
+
+    console.log(user)
+    console.log(data.getUserByID.id)
 
     return (
         <div className='body'>
@@ -100,6 +102,12 @@ export default function ProfilePage() {
             <div className='full-screen'>
                 <div className='grid grid-template-col-1 w-5/6'>
                     <div className='flex flex-col border-2 rounded-lg shadow-md mt-10 mr-32 ml-32 p-10'>
+                        {
+                            id === user.id &&
+                            <div>
+                                <BiLogOut className='delete-style cursor-pointer' onClick={logoutButtonHandler} size={30}/>
+                            </div>
+                        }
                         { data.getUserByID && 
                             <label htmlFor='profileImg' className='w-fit w-200px rounded-50'>
                                 {data.getUserByID.profilePicture ? 
@@ -121,13 +129,13 @@ export default function ProfilePage() {
                         
                         <div>
                         {
-                            (id !== user.id && data.getUserByID.connectRequest.includes(user.id) === true) &&
+                            (id !== user.id && user.requestConnectTo.includes(data.getUserByID.id) === true) &&
                             <p>Requested</p>
                         }
                         </div>
                         <div>
                         {
-                            (id !== user.id && data.getUserByID.connectRequest.includes(user.id) === false) &&
+                            (id !== user.id && user.requestConnectTo.includes(data.getUserByID.id) === false) &&
                             <button onClick={connectButtonHandler}>Connect</button>  
                         }
                           
