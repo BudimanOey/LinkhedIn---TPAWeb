@@ -14,10 +14,12 @@ type User {
   password: String!
   activated: Boolean!
   profilePicture: String!
+  backgroundPicture: String!
   connectRequest: [String!]!
   requestConnectTo: [String!]!
   connectedUser: [String!]!
   followedUser: [String!]!
+  blockedUser: [String!]!
 }
 
 
@@ -28,16 +30,24 @@ type Query {
 }
 
 type Mutation {
-  registerUser(input: NewUser!): Any!
+  registerUser(input: NewUser!, backgroundPicture: String!): Any!
   loginUser(email: String!, password: String!): Any!
+  loginUserByGmail(email: String!): Any!
   activateUser(id: String!): Any!
   updateProfileImage(id: String!, imgURL: String!): String!
+  updateBackgroundPicture(id: String!, imgURL: String!): String!
+  updateUsername(id: String!, newUsername: String): String!
   updateUserPassword(id: String!, newPass: String!): String!
   connectionRequest(userID: String!, recepient:String!): String!
   requestConnectTo(userID: String!, recepient:String!): String!
   acceptConnection(userID: String!, sender:String!): String!
+  declineConnection(userID: String!, sender: String!): String!
   removeConnectRequest(userID: String!, sender:String!): String!
   removeRequestConnectTo(userID: String!, recepient: String!): String!
+  followUser(userID: String!, recepient: String!): String!
+  unfollowUser(userID: String!, recepient: String!): String!
+  blockUser(UserID: String!, recepient: String!): String! 
+  unblockUser(UserID: String!, recepient: String!): String!
 }
 
 input NewUser {
@@ -45,5 +55,6 @@ input NewUser {
   lastName: String!
   email: String!
   password: String!
+  profilePicture: String!
 }
 

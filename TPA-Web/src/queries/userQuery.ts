@@ -5,15 +5,19 @@ export const REGISTER_USER = gql`
   $firstName: String!, 
   $lastName: String!, 
   $email:String!, 
-  $password:String!)
+  $password:String!,
+  $profilePic: String!,
+  $backgroundPic: String!)
   {
   registerUser(
     input:{
       firstName:$firstName,
       lastName:$lastName,
       email:$email, 
-      password:$password
+      password:$password,
+      profilePicture: $profilePic,
     }
+    backgroundPicture: $backgroundPic
   )
 }
 `
@@ -21,6 +25,12 @@ export const REGISTER_USER = gql`
 export const LOGIN_USER = gql`
   mutation loginUser($email: String!, $password: String!){
     loginUser(email: $email, password: $password)
+  }
+`
+
+export const LOGIN_BY_GMAIL = gql`
+  mutation loginUserByGmail($email: String!){
+    loginUserByGmail(email: $email)
   }
 `
 
@@ -33,7 +43,6 @@ export const ACTIVATE_USER = gql`
 export const GET_USER_BY_EMAIL = gql`
   query getUser($email: String!){
     getUserByEmail(email: $email){
-      id
       email
     }
   }
@@ -48,11 +57,13 @@ export const GET_USER_BY_ID = gql`
       email,
       password,
       profilePicture,
+      backgroundPicture,
       activated,
       connectRequest,
       requestConnectTo,
       connectedUser,
-      followedUser
+      followedUser,
+      blockedUser
     }
   }
 `
@@ -77,14 +88,31 @@ export const UPDATE_PROFILE_PICTURE = gql`
   }
 `
 
-export const REQUEST_CONNECT = gql`
-  mutation reqConn($userID: String!, $recepient: String!){
-    connectionRequest(userID: $userID, recepient: $recepient)
+export const UPDATE_BACKGROUND_PICTURE = gql`
+  mutation updateBackPic($id: String!, $url: String!){
+    updateBackgroundPicture(id:$id, imgURL:$url)
   }
 `
 
-export const ACCEPT_CONNECT = gql`
-  mutation acceptConnection($userID: String!, $sender: String!){
-    acceptConnection(userID: $userID, sender:$sender)
+export const FOLLOW_USER = gql`
+  mutation follow($userID: String!, $recepient: String!){
+    followUser(userID: $userID, recepient: $recepient)
+  }
+`
+export const UNFOLLOW_USER = gql`
+  mutation unfoll($userID: String!, $recepient: String!){
+    unfollowUser(userID: $userID, recepient: $recepient)
+  }
+`
+
+export const BLOCK_USER = gql`
+  mutation block($userID: String!, $recepient: String!){
+    blockUser(UserID: $userID, recepient: $recepient)
+  }
+`
+
+export const UNBLOCK_USER = gql`
+  mutation unblock($userID:String!, $recepient: String!){
+    unblockUser(UserID: $userID, recepient: $recepient)
   }
 `

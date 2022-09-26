@@ -17,7 +17,7 @@ import (
 )
 
 // RegisterUser is the resolver for the registerUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (interface{}, error) {
+func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser, backgroundPicture string) (interface{}, error) {
 	_, err := r.Query().GetUserByEmail(ctx, input.Email)
 
 	if err == nil {
@@ -25,17 +25,19 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser
 	}
 
 	user := &model.User{
-		ID:        uuid.NewString(),
-		FirstName: input.FirstName,
-		LastName:  input.LastName,
-		Email:     input.Email,
-		Password:  helper.HashPassword(input.Password),
-		Activated: false,
-		ConnectRequest: []string{},
-		RequestConnectTo: []string{},
-		ConnectedUser: []string{},
-		FollowedUser: []string{},
-
+		ID:                uuid.NewString(),
+		FirstName:         input.FirstName,
+		LastName:          input.LastName,
+		Email:             input.Email,
+		Password:          helper.HashPassword(input.Password),
+		Activated:         false,
+		ProfilePicture:    input.ProfilePicture,
+		BackgroundPicture: backgroundPicture,
+		ConnectRequest:    []string{},
+		RequestConnectTo:  []string{},
+		ConnectedUser:     []string{},
+		FollowedUser:      []string{},
+		BlockedUser:       []string{},
 	}
 
 	if err := r.DB.Model(user).Create(user).Error; err != nil {
@@ -72,16 +74,54 @@ func (r *mutationResolver) LoginUser(ctx context.Context, email string, password
 	}
 
 	return map[string]interface{}{
-		"id":               user.ID,
-		"token":            token,
-		"name":             user.FirstName + " " + user.LastName,
-		"email":            user.Email,
-		"profilePic":       user.ProfilePicture,
-		"activated":        user.Activated,
-		"connectRequest":   user.ConnectRequest,
-		"requestConnectTo": user.RequestConnectTo,
-		"connectedUser":    user.ConnectedUser,
-		"followedUser":     user.FollowedUser,
+		"id":                user.ID,
+		"token":             token,
+		"firstName":         user.FirstName,
+		"lastName":          user.LastName,
+		"email":             user.Email,
+		"profilePicture":    user.ProfilePicture,
+		"backgroundPicture": user.BackgroundPicture,
+		"activated":         user.Activated,
+		"connectRequest":    user.ConnectRequest,
+		"requestConnectTo":  user.RequestConnectTo,
+		"connectedUser":     user.ConnectedUser,
+		"followedUser":      user.FollowedUser,
+		"blockedUser":       user.BlockedUser,
+	}, nil
+}
+
+// LoginUserByGmail is the resolver for the loginUserByGmail field.
+func (r *mutationResolver) LoginUserByGmail(ctx context.Context, email string) (interface{}, error) {
+	user, errGetUser := r.Query().GetUserByEmail(ctx, email)
+	if errGetUser != nil {
+		if errGetUser == gorm.ErrRecordNotFound {
+			return nil, &gqlerror.Error{
+				Message: "Email not found!",
+			}
+		}
+		return nil, errGetUser
+	}
+
+	token, errGenerate := service.JwtGenerate(ctx, user.ID)
+
+	if errGenerate != nil {
+		return nil, errGenerate
+	}
+
+	return map[string]interface{}{
+		"id":                user.ID,
+		"token":             token,
+		"firstName":         user.FirstName,
+		"lastName":          user.LastName,
+		"email":             user.Email,
+		"profilePicture":    user.ProfilePicture,
+		"backgroundPicture": user.BackgroundPicture,
+		"activated":         user.Activated,
+		"connectRequest":    user.ConnectRequest,
+		"requestConnectTo":  user.RequestConnectTo,
+		"connectedUser":     user.ConnectedUser,
+		"followedUser":      user.FollowedUser,
+		"blockedUser":       user.BlockedUser,
 	}, nil
 }
 
@@ -101,6 +141,18 @@ func (r *mutationResolver) UpdateProfileImage(ctx context.Context, id string, im
 	return imgURL, err
 }
 
+// UpdateBackgroundPicture is the resolver for the updateBackgroundPicture field.
+func (r *mutationResolver) UpdateBackgroundPicture(ctx context.Context, id string, imgURL string) (string, error) {
+	var user *model.User
+	err := r.DB.Model(user).Where("ID = ?", id).Update("background_picture", imgURL).Error
+	return imgURL, err
+}
+
+// UpdateUsername is the resolver for the updateUsername field.
+func (r *mutationResolver) UpdateUsername(ctx context.Context, id string, newUsername *string) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 // UpdateUserPassword is the resolver for the updateUserPassword field.
 func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, newPass string) (string, error) {
 	var user *model.User
@@ -117,8 +169,8 @@ func (r *mutationResolver) ConnectionRequest(ctx context.Context, userID string,
 	}
 
 	user.ConnectRequest = append(user.ConnectRequest, userID)
-	_,err := r.RequestConnectTo(ctx, userID, recepient)
-	
+	_, err := r.RequestConnectTo(ctx, userID, recepient)
+
 	if err != nil {
 		return "error", nil
 	}
@@ -185,6 +237,22 @@ func (r *mutationResolver) AcceptConnection(ctx context.Context, userID string, 
 	return "Success", nil
 }
 
+// DeclineConnection is the resolver for the declineConnection field.
+func (r *mutationResolver) DeclineConnection(ctx context.Context, userID string, sender string) (string, error) {
+	_, err := r.RemoveConnectRequest(ctx, userID, sender)
+
+	_, err2 := r.RemoveRequestConnectTo(ctx, sender, userID)
+
+	if err != nil {
+		return "Error while remove req connect !", err
+	}
+
+	if err2 != nil {
+		return "Error", nil
+	}
+	return "Success", nil
+}
+
 // RemoveConnectRequest is the resolver for the removeConnectRequest field.
 func (r *mutationResolver) RemoveConnectRequest(ctx context.Context, userID string, sender string) (string, error) {
 	user := new(model.User)
@@ -233,6 +301,78 @@ func (r *mutationResolver) RemoveRequestConnectTo(ctx context.Context, userID st
 	return "Success", r.DB.Save(user).Error
 }
 
+// FollowUser is the resolver for the followUser field.
+func (r *mutationResolver) FollowUser(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	user.FollowedUser = append(user.FollowedUser, recepient)
+
+	return "Success", r.DB.Save(user).Error
+}
+
+// UnfollowUser is the resolver for the unfollowUser field.
+func (r *mutationResolver) UnfollowUser(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	arrLen := (len(user.FollowedUser) - 1)
+	newArr := make([]string, arrLen)
+	k := 0
+	for i := 0; i < arrLen; {
+		if user.FollowedUser[i] != recepient {
+			newArr[i] = user.FollowedUser[k]
+			k++
+			i++
+		} else {
+			k++
+		}
+	}
+	user.FollowedUser = newArr
+	return "Success remove", r.DB.Save(user).Error
+}
+
+// BlockUser is the resolver for the blockUser field.
+func (r *mutationResolver) BlockUser(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	user.BlockedUser = append(user.BlockedUser, recepient)
+
+	return "Blocked", r.DB.Save(user).Error
+}
+
+// UnblockUser is the resolver for the unblockUser field.
+func (r *mutationResolver) UnblockUser(ctx context.Context, userID string, recepient string) (string, error) {
+	user := new(model.User)
+
+	if err := r.DB.First(user, "ID = ?", userID).Error; err != nil {
+		return "Error while getting user", err
+	}
+
+	arrLen := (len(user.BlockedUser) - 1)
+	newArr := make([]string, arrLen)
+	k := 0
+	for i := 0; i < arrLen; {
+		if user.BlockedUser[i] != recepient {
+			newArr[i] = user.BlockedUser[k]
+			k++
+			i++
+		} else {
+			k++
+		}
+	}
+	user.BlockedUser = newArr
+	return "unblocked", r.DB.Save(user).Error
+}
+
 // GetUserByEmail is the resolver for the getUserByEmail field.
 func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user *model.User
@@ -278,6 +418,11 @@ func (r *userResolver) FollowedUser(ctx context.Context, obj *model.User) ([]str
 	return obj.FollowedUser, nil
 }
 
+// BlockedUser is the resolver for the blockedUser field.
+func (r *userResolver) BlockedUser(ctx context.Context, obj *model.User) ([]string, error) {
+	return obj.BlockedUser, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -290,18 +435,3 @@ func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *queryResolver) GetUserProfilePic(ctx context.Context, id string) (string, error) {
-	var user *model.User
-	err := r.DB.Model(user).Where("ID LIKE ?", id).Error
-	return user.ProfilePicture, err
-}

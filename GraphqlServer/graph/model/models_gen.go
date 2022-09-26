@@ -27,6 +27,14 @@ type Experience struct {
 	CurrentlyWorking bool   `json:"currentlyWorking"`
 }
 
+type Job struct {
+	ID        string `json:"id"`
+	Title     string `json:"title"`
+	Company   string `json:"company"`
+	Location  string `json:"location"`
+	CreatedAt string `json:"createdAt"`
+}
+
 type NewEducation struct {
 	UserID      string  `json:"userID"`
 	School      string  `json:"school"`
@@ -48,6 +56,13 @@ type NewExperience struct {
 	EndDate          string `json:"endDate"`
 	Description      string `json:"description"`
 	CurrentlyWorking bool   `json:"currentlyWorking"`
+}
+
+type NewJob struct {
+	Title     string `json:"title"`
+	Company   string `json:"company"`
+	Location  string `json:"location"`
+	CreatedAt string `json:"createdAt"`
 }
 
 type ResetPassLink struct {

@@ -9,7 +9,7 @@ import { IoIosCreate } from 'react-icons/io';
 import UpdateExperience from "../modals/UpdateExperience";
 
 
-export default function Experience({id, setOpenModal, refetchData, setRefetchData}:any) {
+export default function Experience({id, setOpenModal, refetchData, setRefetchData, activeExp, setActiveExp}:any) {
     const user = useContext(UserContext);
     const [removeExp] = useMutation(REMOVE_EXPERIENCE)
     const [updateExpModal, setUpdateExpModal] = useState(false)
@@ -45,7 +45,7 @@ export default function Experience({id, setOpenModal, refetchData, setRefetchDat
 
 
     return (
-        <div className='flex flex-col border-2 rounded-lg shadow-md mt-5 mr-32 ml-32'>
+        <div className='flex flex-col border-2 rounded-lg shadow-md mt-5 mr-32 ml-32 bg-white'>
             <div className='flex w-100 justify-between items-center pl-5 m-3'>
                 <span className='font-bold text-2xl'>Experience</span>
                 {

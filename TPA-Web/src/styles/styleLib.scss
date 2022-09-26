@@ -19,6 +19,8 @@ body {
   justify-content: center;
 }
 
+
+
 .width-100{
     width: 100vw;
 }
@@ -215,6 +217,10 @@ body {
   flex-direction: column;
 }
 
+.color-black {
+ color: #000000;
+}
+
 // Border Width
 .border-0 {
   border-width: 0px;
@@ -231,7 +237,9 @@ body {
 .border-bt-2-grey{
     border-bottom: 1px grey solid;
 }
-
+.border-tp-2-grey {
+  border-top: 1px grey solid;
+}
 .border-4 {
   border-width: 4px;
 }
@@ -345,6 +353,9 @@ body {
 
 .top-0{
   top: 0;
+}
+.right-0 {
+  right: 0;
 }
 
 // Padding
@@ -2364,8 +2375,20 @@ p.t-52 {
 .bg-rose-800 {
   background-color: rgb(159 18 57);
 }
+.bg-gray-200{
+  background-color: rgb(209, 209, 209);
+}
+.bg-gray-400{
+  background-color: rgba(132, 132, 132, 0.258);
+}
+.bg-gray-600{
+  background-color: rgb(141, 141, 141);
+}
 .bg-grey-800{
   background-color: gray;
+}
+.bg-linkhedin {
+  background-color: #e9e3ce;
 }
 
 // Width
@@ -2465,6 +2488,9 @@ p.t-52 {
 .w-full {
   width: 100%;
 }
+.w-30 {
+  width: 30%;
+}
 .w-screen {
   width: 100vw;
 }
@@ -2474,13 +2500,33 @@ p.t-52 {
 .max-w-xs {
   max-width: 20rem;
 }
-
+.max-w-lg {
+  max-width: 32rem;
+}
+.maxw-2xl {
+  max-width: 42rem;
+}
 .max-w-4xl {
   max-width: 56rem;
 }
 
 .max-w-6xl {
   max-width: 72rem;
+}
+
+.max-w-xs {
+  max-width: 20rem;
+}
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.max-h-2xl {
+  max-width: 42rem;
+}
+
+.max-h-4xl {
+  max-width: 56rem;
 }
 
 .max-h-6xl {
@@ -2602,6 +2648,12 @@ p.t-52 {
 }
 .h-80vw{
   height: 80vw;
+}
+.h-fit {
+  height: fit-content;
+}
+.select-none {
+  user-select: none;
 }
 // Gap
 .gap-4 {
@@ -2761,6 +2813,9 @@ p.t-52 {
   width: 30px;
   height: 30px;
   border-radius: 50%;
+  border-style: solid;
+  border-color: grey;
+  border-width: 1px;
 }
 
 .w-200px {
@@ -2772,6 +2827,9 @@ p.t-52 {
   vertical-align: middle;
   width: 200px;
   height: 200px;
+  border-style: solid;
+  border-color: grey;
+  border-width: 2px;
   border-radius: 50%;
 }
 
@@ -3675,6 +3733,9 @@ p.t-52 {
 .align-text-bottom {
   vertical-align: text-bottom;
 }
+.align-text-left {
+  text-align: left;
+}
 .align-sub {
   vertical-align: sub;
 }
@@ -3707,6 +3768,10 @@ p.t-52 {
   position: sticky;
 }
 
+.color-grey-400 {
+  color: rgba(140, 139, 139, 0.891);
+}
+
 // Cursor
 
 .cursor-pointer {
@@ -3724,8 +3789,16 @@ p.t-52 {
 }
 
 //indexing
+.z-index-2 {
+  z-index: 2;
+}
+
 .z-index-10{
   z-index: 10;
+}
+
+.z-index-100{
+  z-index: 100;
 }
 
 //opacity 

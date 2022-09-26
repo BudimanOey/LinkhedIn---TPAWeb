@@ -1,0 +1,62 @@
+.createPostBtn{
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.createPostBtn:hover {
+    background-color: rgba(239, 237, 237, 0.77);
+}
+
+.post-text-area {
+    width: 93%;
+    height: 80px;
+    border-radius: 10px;
+    padding: 15px;
+    resize: none;
+}
+
+.videoIcon {
+    margin-right: 20px;
+    margin-top: 10px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.videoIcon:hover {
+    scale: 120%;
+}
+
+.photoIcon {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.photoIcon:hover {
+    scale: 120%;
+}
+.likeIcon {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.likeIcon:hover {
+    color: rgb(233, 107, 107);
+}
+.commentIcon {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.commentIcon:hover {
+    color: rgb(101, 172, 235);
+}
+.shareIcon {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.shareIcon:hover {
+    color: grey;
+}
+.unlikeIcon {
+    color: rgb(237, 111, 111);
+}
+.color-grey {
+    color: rgba(153, 153, 153, 0.826);
+}

@@ -46,7 +46,7 @@ export default function InsertNewpassPage() {
     }
 
     return (
-        <div>
+        <div className='flex center-all full-screen'>
             <div className='form'>
                 <span className='signIn'>Insert new password</span>
                 <p className='pl-3'>Reset your password with the new one</p>

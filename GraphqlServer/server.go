@@ -39,6 +39,9 @@ func migrateTable(db *gorm.DB) {
 	db.AutoMigrate(&model.ResetPassLink{})
 	db.AutoMigrate(&model.Education{})
 	db.AutoMigrate(&model.Experience{})
+	db.AutoMigrate(&model.Job{})
+	db.AutoMigrate(&model.Post{})
+	db.AutoMigrate(&model.Comment{})
 }
 
 func main() {

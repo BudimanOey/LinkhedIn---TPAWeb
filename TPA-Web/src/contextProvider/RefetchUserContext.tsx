@@ -19,10 +19,9 @@ export default function RefetchUserProvider({children}:any){
     function refetchUserData(){
         refetch().then((e)=>{
             const newUser = {...e.data.getUserByID, token: user.token}
-            console.log(newUser)
+            // console.log(newUser)
             setUser(newUser)
-            console.log(user)
-            // setUser(newUser)
+            // console.log(user)
         })
     }
 

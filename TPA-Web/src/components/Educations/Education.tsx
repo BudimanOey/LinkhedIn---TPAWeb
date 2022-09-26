@@ -41,7 +41,7 @@ export default function Education({id, setOpenModal, refetchData, setRefetchData
 
 
     return (
-        <div className='flex flex-col border-2 rounded-lg shadow-md mt-5 mr-32 ml-32'>
+        <div className='flex flex-col border-2 rounded-lg shadow-md mt-5 mr-32 ml-32 bg-white'>
             <div className='flex w-100 justify-between items-center pl-5 m-3'>
                 <span className='font-bold text-2xl'>Education</span>
                 {

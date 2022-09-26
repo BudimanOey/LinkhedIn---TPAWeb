@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { GET_ACTIVATION } from '../queries/activationQuery'
 import { ACTIVATE_USER } from '../queries/userQuery'
 import { IoMdArrowBack } from "react-icons/io";
@@ -9,7 +9,6 @@ import NotFoundPage from './NotFoundPage'
 
 
 export default function ActivatePage() {
-    // const navigate = useNavigate()
     const {id} = useParams()
     const [activateUser] = useMutation(ACTIVATE_USER)
     const {loading, error,data} = useQuery(GET_ACTIVATION, {
@@ -17,6 +16,7 @@ export default function ActivatePage() {
             id: id
         }
     })
+
 
     function activateUserHandler(){
         if(data){
@@ -29,8 +29,10 @@ export default function ActivatePage() {
     }
 
     useEffect(() => {
+        console.log(data)
+
         activateUserHandler()
-    }, [])
+    }, [data])
       
 
     if(loading)return (
@@ -47,12 +49,11 @@ export default function ActivatePage() {
 
     
     return (
-        <div>
+        <div className='pl-32'>
             <h1>Your Account is active now!</h1>
-            <div className='flex'>
-                {/* <IoMdArrowBack/> */}
-                <h4>Go back to login</h4>
-            </div>
+                <Link to={'/'}>
+                <h4 className='flex align-center cursor-pointer max-w-'><IoMdArrowBack size={24} className='pr-5'/>Go back to login</h4>
+                </Link>
         </div>
     )
 }

@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage'
 import UserContextProvider from './contextProvider/userContext'
 import RefetchUserProvider from './contextProvider/RefetchUserContext'
 import Network from './pages/Network'
+import Jobs from './pages/Jobs'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
               <Route path='/resetpass/:id' element={<InsertNewpassPage/>}/>
               <Route path='/home' element={<Auth><HomePage/></Auth>}/>
               <Route path='/network' element={<Auth><Network/></Auth>}/>
+              <Route path='/jobs'element={<Auth><Jobs/></Auth>}/>
               <Route path='/profile/:id'element={<Auth><ProfilePage/></Auth>}/>
             </Routes>
           </RefetchUserProvider>

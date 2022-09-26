@@ -1,0 +1,26 @@
+type Comment {
+    id: ID!
+    content: String!
+    commentOfPost: String!
+    likedBy: [String!]!
+    replyOfComment: String!
+    createdAt: Time!
+    commentedBy: String!
+}
+
+input NewComment {
+    commentedBy: String!
+    commentOfPost: String!
+    replyOfComment: String!
+    content: String!
+}
+
+extend type Query {
+    getCommentFromPost(postID:String!, limit: Int!, offset: Int!): [Comment!]!
+    getCommentReplies(commentID: String!, limit: Int!, offset: Int!): [Comment!]!
+}
+
+extend type Mutation {
+    addComment(input: NewComment): String!
+    likeComment(commentID: String!, likedByID: String!): String!
+}
