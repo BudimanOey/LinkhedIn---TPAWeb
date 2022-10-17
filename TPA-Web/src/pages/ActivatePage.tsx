@@ -29,7 +29,7 @@ export default function ActivatePage() {
     }
 
     useEffect(() => {
-        console.log(data)
+        // console.log(data)
 
         activateUserHandler()
     }, [data])

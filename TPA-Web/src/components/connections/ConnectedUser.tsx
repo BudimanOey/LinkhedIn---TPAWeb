@@ -31,7 +31,7 @@ export default function ConnectedUser(props:any) {
                 <img src={defaultProfile} alt="" className='w-14 h-14 rounded-50 border-2-grey mr-10'/>
             }
             </div>
-            <p>{data.getUserByID.firstName} {data.getUserByID.lastName}</p>
+            <p className='font-bold'>{data.getUserByID.firstName} {data.getUserByID.lastName}</p>
         </div>
     )
 }

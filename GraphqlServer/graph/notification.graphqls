@@ -1,0 +1,15 @@
+type Notification {
+    id: ID!
+    message: String!
+    fromUser: String!
+    toUser: String!
+    createdAt: Time!
+}
+
+extend type Query {
+    getNotifications(userID: String!): [Notification!]! 
+}
+
+extend type Mutation {
+    addNotification(userID: String!, toUser: String!, information: String!): String!
+}

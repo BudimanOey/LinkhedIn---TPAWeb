@@ -19,13 +19,17 @@ export default function ResetPasswordPage() {
     })
     
     function generateLink(){
-        genLink({
-            variables:{
-                userID: data.getUserByEmail.id,
-                email: data.getUserByEmail.email
-            }
-        })
-        setEmailSent(true)
+        console.log(data)
+        if(data){
+            genLink({
+                variables:{
+                    userID: data.getUserByEmail.id,
+                    email: data.getUserByEmail.email
+                }
+            }).then(()=>{
+                setEmailSent(true)
+            })
+        }
     }
 
     function resetPassHandler(){

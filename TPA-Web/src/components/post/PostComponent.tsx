@@ -4,9 +4,9 @@ import profile from '../../assets/profile.jpg'
 import '../../styles/post.scss'
 import { useQuery } from '@apollo/client'
 import { GET_POST } from '../../queries/postQuery'
-import PostCard from './PostCard'
+import {PostCard} from './PostCard'
 
-export default function PostComponent({setModal, refetchPost}:any) {
+export default function PostComponent({setModal, refetchPost, setUserList, setPostID}:any) {
   const {user, setUser} = useContext(UserContext)
   const {loading, error, data, refetch, fetchMore, networkStatus} = useQuery(GET_POST, {
       variables: {
@@ -28,28 +28,20 @@ export default function PostComponent({setModal, refetchPost}:any) {
   }
 
   window.onscroll = () => {
+    
     if (window.innerHeight + window.scrollY > document.body.offsetHeight) {
-      fetchMore({
+      if(networkStatus !== 3){
+        fetchMore({
           variables: { offset: data.getPosts.length },
-          updateQuery: (previousResult, { fetchMoreResult }) => {
-              let check = false;
-
-              for (let index = 0; index < previousResult.getPosts.length; index++) {
-                  for (let index2 = 0; index2 < fetchMoreResult.getPosts.length; index2++) {
-                      if (previousResult.getPosts[index].id === fetchMoreResult.getPosts[index2].id) {
-                          check = true
-                      }
-                  }
-              }
-
-              if (check === true) {
-                  return previousResult
-                  
-              } else {
-                  return { getPosts: [...previousResult.getPosts, ...fetchMoreResult.getPosts] }
+          updateQuery: (previousResult, { fetchMoreResult }) => {   
+              if(!fetchMoreResult.getPosts.length){
+                return previousResult
+              }else{
+                return { getPosts: [...previousResult.getPosts, ...fetchMoreResult.getPosts] }
               }
           },
-      })
+        })
+      }
     }
   }
 
@@ -76,7 +68,7 @@ export default function PostComponent({setModal, refetchPost}:any) {
             postData.map((e)=>{
               return(
                 <div className="mt-10" key={e.id}>
-                  <PostCard postData={e} refetchPostData={refetch}/>
+                  <PostCard postData={e} refetchPostData={refetch} setModal={setUserList} setPostID={setPostID}/>
                 </div>
               )
             })

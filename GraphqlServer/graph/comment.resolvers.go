@@ -32,6 +32,22 @@ func (r *mutationResolver) AddComment(ctx context.Context, input *model.NewComme
 		return "Fail create comment", err
 	}
 
+	if comment.CommentOfPost != "" {
+
+		post, err := r.Query().GetPostByID(ctx, &comment.CommentOfPost)
+		if err != nil {
+			return "Error while getting post", err
+		}
+
+		if post.Creator != comment.CommentedBy {
+			_, err2 := r.AddNotification(ctx, comment.CommentedBy, post.Creator, "Has commented your post!")
+
+			if err2 != nil {
+				return "Error while sending notif", err
+			}
+		}
+	}
+
 	return "Success create", nil
 }
 

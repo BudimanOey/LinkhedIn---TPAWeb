@@ -34,14 +34,20 @@ func MyCors(next http.Handler) http.Handler {
 }
 
 func migrateTable(db *gorm.DB) {
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Invitation{})
-	db.AutoMigrate(&model.ResetPassLink{})
-	db.AutoMigrate(&model.Education{})
-	db.AutoMigrate(&model.Experience{})
-	db.AutoMigrate(&model.Job{})
-	db.AutoMigrate(&model.Post{})
-	db.AutoMigrate(&model.Comment{})
+	db.AutoMigrate(
+		&model.User{},
+		&model.Invitation{},
+		&model.ResetPassLink{},
+		&model.Education{},
+		&model.Experience{},
+		&model.Job{},
+		&model.Post{},
+		&model.Comment{},
+		&model.Hashtag{},
+		&model.Notification{},
+		&model.Message{},
+		&model.ChatRoom{},
+	)
 }
 
 func main() {

@@ -1,0 +1,11 @@
+type Hashtag {
+    id: ID!
+    hashtag: String!
+}
+
+extend type Query {
+    getHashtags: [Hashtag!]!
+}
+extend type Mutation {
+    addHashtag(hashtag: String!): Hashtag!
+}

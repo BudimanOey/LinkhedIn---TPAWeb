@@ -25,6 +25,20 @@ export const GET_POST = gql`
     }
 `
 
+export const GET_POST_BY_ID = gql`
+    query getPostByID($id:String!){
+        getPostByID(id:$id){
+            id,
+            text,
+            photoURL,
+            videoURL,
+            creator,
+            likedBy,
+            createdAt
+        }
+    }
+`
+
 export const LIKE_POST = gql`
     mutation likePosting($postID: String!, $likedByID:String!) {
         likePost(postID: $postID, likedByID: $likedByID)

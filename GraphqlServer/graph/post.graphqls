@@ -19,6 +19,7 @@ input NewPost {
 
 extend type Query {
     getPosts(id: String!,  limit: Int!, offset: Int!): [Post!]!
+    getPostByID(id: String): Post!
 }
 
 extend type Mutation {

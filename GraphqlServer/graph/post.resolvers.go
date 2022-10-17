@@ -35,6 +35,14 @@ func (r *mutationResolver) LikePost(ctx context.Context, postID string, likedByI
 		return "Post not found", err
 	}
 	post.LikedBy = append(post.LikedBy, likedByID)
+
+	if likedByID != post.Creator {
+		_, err := r.AddNotification(ctx, likedByID, post.Creator, "Has liked your post!")
+		if err != nil {
+			return "Error while adding notif", err
+		}
+	}
+
 	return "Success like post", r.DB.Save(post).Error
 }
 
@@ -64,6 +72,16 @@ func (r *queryResolver) GetPosts(ctx context.Context, id string, limit int, offs
 
 	err := r.DB.Model(posts).Limit(limit).Offset(offset).Order("created_at desc").Find(&posts, "creator IN (?)", arr).Error
 	return posts, err
+}
+
+// GetPostByID is the resolver for the getPostByID field.
+func (r *queryResolver) GetPostByID(ctx context.Context, id *string) (*model.Post, error) {
+	var post *model.Post
+	err := r.DB.Model(post).Where("ID LIKE ?", id).Take(&post).Error
+	if err != nil {
+		return nil, err
+	}
+	return post, nil
 }
 
 // Post returns generated.PostResolver implementation.

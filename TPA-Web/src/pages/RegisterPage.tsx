@@ -27,27 +27,32 @@ export default function RegisterPage() {
     const passValue = (document.getElementById("passwordInput") as HTMLInputElement).value;
     const confPassValue = (document.getElementById("confPassInput") as HTMLInputElement).value;
    
-    if(validatePass(passValue, confPassValue)){
-      const storageRef = ref(storage, 'images/defaultBackgroundPhoto/defbackground.jpg');
-      getDownloadURL(storageRef).then((url)=>{
-        // console.log(url)
-        registerUser({
-          variables: {
-            firstName: firstname,
-            lastName: lastname,
-            email: email, 
-            password: passValue,
-            profilePic: profilePic,
-            backgroundPic: url
-          }
-        }).then(()=>{
-          alert("Success Created!");
-          navigate('/');
-        })
-      })  
+    if(firstname != "" && lastname != "" && email != "" && passValue != "" && confPassValue != ""){
+      if(validatePass(passValue, confPassValue)){
+        const storageRef = ref(storage, 'images/defaultBackgroundPhoto/defbackground.jpg');
+        getDownloadURL(storageRef).then((url)=>{
+          // console.log(url)
+          registerUser({
+            variables: {
+              firstName: firstname,
+              lastName: lastname,
+              email: email, 
+              password: passValue,
+              profilePic: profilePic,
+              backgroundPic: url
+            }
+          }).then(()=>{
+            alert("Success Created!");
+            navigate('/');
+          })
+        })  
+      }else{
+        setErrMsg("Recheck your password!");
+      }
     }else{
-      setErrMsg("Recheck your password!");
+      alert("All fields need to be filled!");
     }
+    
 
   }
 
@@ -93,7 +98,7 @@ export default function RegisterPage() {
           <p className='spliter'>or</p>
 
           
-          <Link to={"/"}>Home</Link>
+          <Link to={"/"}>Sign in</Link>
           {/* <Link to={"/register"}>Click here</Link> */}
         </div>
       </div>

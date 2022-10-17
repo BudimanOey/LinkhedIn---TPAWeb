@@ -1,0 +1,35 @@
+.chatbox-container{
+    display: flex;
+    width: 80%;
+    min-width: 500px;
+}
+
+.chat-box {
+    width: 60%;
+}
+
+.friend-box {
+    background-color: whitesmoke;
+    width: 40%;
+    height: 565px;
+}
+
+.chat-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.chat-card:hover {
+    background-color: rgb(227, 227, 227);
+}
+
+.message-box {
+    height: 450px;
+}
+
+.max-w-50px {
+    max-width: 50px;
+}
+
+.h-500 {
+    height: 500px;
+}

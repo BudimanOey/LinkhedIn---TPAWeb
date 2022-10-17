@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Education struct {
 	ID          string  `json:"id"`
 	UserID      string  `json:"userID"`
@@ -25,6 +29,11 @@ type Experience struct {
 	EndDate          string `json:"endDate"`
 	Description      string `json:"description"`
 	CurrentlyWorking bool   `json:"currentlyWorking"`
+}
+
+type Hashtag struct {
+	ID      string `json:"id"`
+	Hashtag string `json:"hashtag"`
 }
 
 type Job struct {
@@ -65,9 +74,31 @@ type NewJob struct {
 	CreatedAt string `json:"createdAt"`
 }
 
+type NewMessage struct {
+	Sender     string `json:"sender"`
+	RoomID     string `json:"roomID"`
+	Text       string `json:"text"`
+	ImageURL   string `json:"imageURL"`
+	SharedPost string `json:"sharedPost"`
+	SharedUser string `json:"sharedUser"`
+}
+
+type Notification struct {
+	ID        string    `json:"id"`
+	Message   string    `json:"message"`
+	FromUser  string    `json:"fromUser"`
+	ToUser    string    `json:"toUser"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 type ResetPassLink struct {
 	ID     string `json:"id"`
 	UserID string `json:"userID"`
+}
+
+type Search struct {
+	Users []*User `json:"Users"`
+	Posts []*Post `json:"Posts"`
 }
 
 type Invitation struct {

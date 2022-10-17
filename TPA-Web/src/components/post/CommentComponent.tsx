@@ -1,25 +1,28 @@
 import { useQuery } from '@apollo/client'
+import { UserContext } from '../../contextProvider/userContext'
 import { GET_COMMENT } from '../../queries/commentQuery'
+import { useContext, useState } from 'react'
 import CommentCard from './CommentCard'
 
 export default function CommentComponent({postData, refetchComment}:any) {
-
+    const user = useContext(UserContext).user
+    const [refetchButton, setRefetchButton] = useState(true)
     const {loading: getCommentLoading, error: getCommentError, data: commentData,
         refetch, fetchMore} = useQuery(GET_COMMENT, {
-          variables: {
-            postID: postData.id,
-            limit: 3,
-            offset: 0
-          }
+            variables: {
+                postID: postData.id,
+                limit: 3,
+                offset: 0
+            }
         })
    
-        if(refetchComment) {
-            refetch()
-        }
-        
-        if (getCommentLoading) return (
-            <div className="">
-            Loading...
+    if(refetchComment) {
+        refetch()
+    }
+    
+    if (getCommentLoading) return (
+        <div className="">
+        Loading...
         </div>
     )
     
@@ -33,25 +36,13 @@ export default function CommentComponent({postData, refetchComment}:any) {
         fetchMore({
             variables: { offset: commentData.getCommentFromPost.length },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                let check = false;
-  
-                for (let index = 0; index < previousResult.getCommentFromPost.length; index++) {
-                    for (let index2 = 0; index2 < fetchMoreResult.getCommentFromPost.length; index2++) {
-                        if (previousResult.getCommentFromPost[index].id === fetchMoreResult.getCommentFromPost[index2].id) {
-                            check = true
-                        }
-                    }
-                }
-  
-                if (check === true) {
+                if(!fetchMoreResult.getCommentFromPost.length){
                     return previousResult
-                    
-                } else {
+                }else{
                     return { getCommentFromPost: [...previousResult.getCommentFromPost, ...fetchMoreResult.getCommentFromPost] }
                 }
             },
         })
-
     }
 
     const comments = commentData.getCommentFromPost as Array<any>

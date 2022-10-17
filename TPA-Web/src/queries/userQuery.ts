@@ -43,6 +43,7 @@ export const ACTIVATE_USER = gql`
 export const GET_USER_BY_EMAIL = gql`
   query getUser($email: String!){
     getUserByEmail(email: $email){
+      id
       email
     }
   }
@@ -63,7 +64,20 @@ export const GET_USER_BY_ID = gql`
       requestConnectTo,
       connectedUser,
       followedUser,
-      blockedUser
+      blockedUser,
+      visits
+    }
+  }
+`
+
+export const GET_USER_CONNECTIONS = gql`
+  query getConnectedUser($id: String!){
+    getAllConnectedUser(id: $id){
+      id,
+      firstName,
+      lastName,
+      backgroundPicture,
+      email
     }
   }
 `
@@ -114,5 +128,17 @@ export const BLOCK_USER = gql`
 export const UNBLOCK_USER = gql`
   mutation unblock($userID:String!, $recepient: String!){
     unblockUser(UserID: $userID, recepient: $recepient)
+  }
+`
+
+export const VISIT_USER = gql`
+  mutation addVisit($visitor: String!, $visitedUser: String!){
+    addVisit(visitor: $visitor, visitedUser: $visitedUser)
+  }
+`
+
+export const GET_USER_MIGHT_KNOW = gql`
+  query getUserMightKnow($id:String!){
+    getUserYouMightKnow(id: $id)
   }
 `

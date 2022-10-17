@@ -1,0 +1,38 @@
+type ChatRoom {
+    id: ID!,
+    user1: String!,
+    user2: String!,
+    createdAt: Time!
+}
+
+type Message {
+    id: ID!,
+    sender: String!,
+    roomID: String!,
+    text: String!,
+    imageURL: String!
+    sharedPost: String!,
+    sharedUser: String!,
+    createdAt: Time!
+}
+
+input NewMessage{
+    sender: String!,
+    roomID: String!,
+    text: String!,
+    imageURL: String!
+    sharedPost: String!,
+    sharedUser: String!
+}
+
+extend type Query {
+    getChatRoom(roomID: String!): ChatRoom!
+    getChatRooms(userID: String!): [ChatRoom!]!
+    getChatRoomByUsers(user1: String! user2: String!): ChatRoom!
+    getMessages(roomID: String!): [Message]!
+}
+
+extend type Mutation {
+    addChatRoom(userID1: String!, userID2: String!): String!
+    sendMessage(input: NewMessage!): String!
+}

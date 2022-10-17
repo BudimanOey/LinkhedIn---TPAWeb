@@ -1,29 +1,71 @@
 import { useContext,useState } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
-import { GET_USER_BY_ID } from '../../queries/userQuery'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { GET_USER_BY_ID, GET_USER_CONNECTIONS } from '../../queries/userQuery'
 import profile from '../../assets/profile.jpg'
 import { AiOutlineLike,AiOutlineSend } from "react-icons/ai"
 import { BiCommentDetail } from "react-icons/bi"
 import { RiShareForwardLine } from "react-icons/ri"
 import { LIKE_POST } from '../../queries/postQuery'
 import { UserContext } from '../../contextProvider/userContext'
-import { ADD_COMMENT, GET_COMMENT } from '../../queries/commentQuery'
+import { ADD_COMMENT } from '../../queries/commentQuery'
+import { MentionsInput, Mention, SuggestionDataItem } from 'react-mentions'
 import CommentComponent from './CommentComponent'
+import { mentionInputPostStyle, mentionStyle } from '../MentionStyle'
+import CommentContentTemplate from './CommentContentTemplate'
+import { ADD_HASHTAG, GET_HASHTAGS } from '../../queries/hashtagQuery'
+import { HastagRichText1, HastagRichText2 } from '../../helper/RegexFormat'
+import MentionModal from '../modals/MentionModal'
+import { Navigate, useNavigate } from 'react-router-dom'
+import ConnectedUserList from '../modals/ConnectedUserList'
 
-export default function PostCard({postData, refetchPostData}:any) {
+export function PostCard({postData, refetchPostData, setModal, setPostID}:any) {
+    const user = useContext(UserContext).user
+    const navigate = useNavigate()
     const [refetchComment, setRefetchComment] = useState(false)
+    const [hoverProfile, setHoverProfile] = useState(false)
+    const [comment, setComment] = useState("")
+
     const [commentField, setCommentField] = useState(false)
     const {loading, error, data} = useQuery(GET_USER_BY_ID, {
         variables: {
             id: postData.creator,
         }
     })
+    const {loading:getTagUsersLoading, error:getTagUsersError, data: getTagUsersData} = useQuery(GET_USER_CONNECTIONS ,{
+        variables: {
+            id: user.id
+        }
+    })
+    const {loading:getHashtagLoading, error:getHashtageError, data:getHashtagData} = useQuery(GET_HASHTAGS)
+    const [addHastagMutation] = useMutation(ADD_HASHTAG)
     const [addCommentMutation] = useMutation(ADD_COMMENT)
     const [likePost] = useMutation(LIKE_POST)
-    const user = useContext(UserContext).user
+
+    if(loading || getTagUsersLoading || getHashtagLoading) return(
+        <div>Loading...</div>
+    )
+
+    if(error || getTagUsersError || getHashtageError) return (        
+        <div>Error while fetching data!</div>
+    )
     
-    
-    
+    const mentionDatas: SuggestionDataItem[] = []
+    getTagUsersData.getAllConnectedUser.map((dataMention : any) => {
+        let mentionData: SuggestionDataItem = { id: "", display: "" }
+        let at: string = "@"
+        mentionData.id = dataMention.id
+        mentionData.display = at.concat(dataMention.firstName).concat(dataMention.lastName)
+        mentionDatas.push(mentionData)
+    })
+
+    const hashtagDatas: SuggestionDataItem[] = []
+    getHashtagData.getHashtags.map((dataHashtag:any)=>{
+        let hashtagData: SuggestionDataItem = { id: "", display: "" }
+        let at: string = "#"
+        hashtagData.id = at.concat(dataHashtag.id)
+        hashtagData.display = at.concat(dataHashtag.hashtag)
+        hashtagDatas.push(hashtagData)
+    })
 
     function likePostHandler(){
         likePost({
@@ -39,8 +81,18 @@ export default function PostCard({postData, refetchPostData}:any) {
     }    
 
     function addCommentHandler(){
-        const comment = (document.getElementById('commentInput') as HTMLInputElement).value
         if(comment) {
+            const texts = comment.split(" ")
+            texts.map((text)=>{
+                if (text.match(HastagRichText1) && !text.match(HastagRichText2)) {
+                    console.log(text);
+                    const hastagSubstring = text.substring(1, text.length)
+                    addHastagMutation({ variables: { hashtag: hastagSubstring } }).then((e) => {
+                        console.log(e);
+                    })
+                }
+            })
+            
             addCommentMutation({
                 variables: {
                     commentOfPost: postData.id,
@@ -50,29 +102,26 @@ export default function PostCard({postData, refetchPostData}:any) {
                 }
             }).then(()=>{
                 setRefetchComment(true)
+                setComment("")
             }).catch((e)=>{
                 alert(e)
             })
         }
     }
-
-    if(loading) return(
-        <div>Loading...</div>
-    )
-
-    if(error) return (
-        <div>Error while fetching data!</div>
-    )
         
     return (
-        <div className='w-full flex-col bg-white border-2 rounded-lg shadow-md w-full'>
+        <div className='w-full flex-col bg-white border-2 rounded-lg shadow-md'>
              <div className='flex m-3 items-center border-bt-2-grey pb-4'>
-                <div className="">
+                <div className="cursor-pointer" onClick={()=>{navigate(`/profile/${data.getUserByID.id}`)}} onMouseEnter={()=>{setHoverProfile(true)}} onMouseLeave={()=>{setHoverProfile(false)}}>
                 {
                     data.getUserByID.profilePicture ? 
                     <img src={data.getUserByID.profilePicture} className='avatar-nav'/> 
                     :
                     <img src={profile} alt="" className='avatar-nav'/>
+                }
+                {
+                    hoverProfile &&
+                    <MentionModal userID={data.getUserByID.id}/>
                 }
                 </div>
                 <div className='flex flex-col'>
@@ -90,7 +139,10 @@ export default function PostCard({postData, refetchPostData}:any) {
                     postData.videoURL &&
                     <video src={postData.videoURL} className="w-full h-64 border-bt-2-grey" controls/>
                 }
-                <p className='m-4 text-justify pt-4 font-semibold pt-4'>{postData.text}</p>
+                {/* <p className='m-4 text-justify pt-4 font-semibold pt-4'>{postData.text}</p> */}
+                <div className="m-4 text-justify pt-4 font-semibold">
+                    <CommentContentTemplate texts={postData.text.split(" ")}/>
+                </div>
              </div>
              <div className="flex m-4 justify-between pl-5 pr-5">
                 {
@@ -111,7 +163,10 @@ export default function PostCard({postData, refetchPostData}:any) {
                     <BiCommentDetail size={24}/>
                     <span className='select-none'>Comment</span>
                 </div>
-                <div className='center-all shareIcon'>
+                <div className='center-all shareIcon' onClick={()=>{
+                    setModal(true)
+                    setPostID(postData.id)
+                }}>
                     <RiShareForwardLine size={25}/>
                     <span className='select-none'>Share</span>
                 </div>
@@ -126,7 +181,20 @@ export default function PostCard({postData, refetchPostData}:any) {
                             :
                             <img src={profile} alt="" className='avatar-nav'/>
                         }
-                        <input type="text" id="commentInput" className='w-full ml-4 rounded-lg border-2 p-2' placeholder='Add a comment...'/>
+                        {/* <input type="text" id="commentInput" className='w-full ml-4 rounded-lg border-2 p-2' placeholder='Add a comment...'/> */}
+                        <MentionsInput value={comment} onChange={(e)=>{setComment(e.target.value)}} placeholder="Add a comment..." className='w-full ml-4 ' style={mentionInputPostStyle}>
+                            <Mention
+                                trigger="@"
+                                data={mentionDatas}
+                                style={mentionStyle}
+                            />
+                            <Mention
+                                trigger="#"
+                                data={hashtagDatas}
+                                style={mentionStyle}
+                            />
+                        </MentionsInput>
+                        
                         <AiOutlineSend size={30} className="ml-2 shareIcon" onClick={addCommentHandler}/>
                     </div>
 

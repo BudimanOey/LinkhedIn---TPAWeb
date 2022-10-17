@@ -2,6 +2,11 @@
 #
 # https://gqlgen.com/getting-started/
 
+directive @goField(
+  forceResolver: Boolean
+  name: String
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
 directive @auth on FIELD_DEFINITION
 
 scalar Any
@@ -20,12 +25,15 @@ type User {
   connectedUser: [String!]!
   followedUser: [String!]!
   blockedUser: [String!]!
+  visits: [String!]!
 }
 
 
 type Query {
   getUserByEmail(email: String!): User!
   getUserByID(id: String!): User!
+  getAllConnectedUser(id: String!): [User!]!
+  getUserYouMightKnow(id: String!): [String!]!
   testMiddleware: String! @auth
 }
 
@@ -48,6 +56,7 @@ type Mutation {
   unfollowUser(userID: String!, recepient: String!): String!
   blockUser(UserID: String!, recepient: String!): String! 
   unblockUser(UserID: String!, recepient: String!): String!
+  addVisit(visitor: String!, visitedUser: String!): String!
 }
 
 input NewUser {

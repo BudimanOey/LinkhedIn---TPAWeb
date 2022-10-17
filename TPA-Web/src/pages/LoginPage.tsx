@@ -24,7 +24,6 @@ export default function LoginPage() {
       }
     }).then((u)=>{
       if(u.data.loginUser.activated === true){
-        console.log(u.data.loginUser)
         setUser(u.data.loginUser);
         navigate('/home');
       }else{
@@ -41,7 +40,6 @@ export default function LoginPage() {
         email: gmail
       }
     }).then((u)=>{
-      console.log(u)
       if(u.data.loginUserByGmail.activated === true){
         setUser(u.data.loginUserByGmail);
         navigate('/home');
@@ -54,7 +52,7 @@ export default function LoginPage() {
   }
 
   function handleCallbackResponse(response:any){
-    console.log("Encoded JWT Token :" + response.credential);
+    // console.log("Encoded JWT Token :" + response.credential);
     type User = {
       given_name:String,
       family_name:String,

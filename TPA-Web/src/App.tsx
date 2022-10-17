@@ -13,6 +13,9 @@ import UserContextProvider from './contextProvider/userContext'
 import RefetchUserProvider from './contextProvider/RefetchUserContext'
 import Network from './pages/Network'
 import Jobs from './pages/Jobs'
+import NotificationPage from './pages/NotificationPage'
+import MessagePage from './pages/MessagePage'
+import SearchPage from './pages/SearchPage'
 
 
 function App() {
@@ -34,8 +37,14 @@ function App() {
               <Route path='/resetpass' element={<ResetPasswordPage/>}/>
               <Route path='/resetpass/:id' element={<InsertNewpassPage/>}/>
               <Route path='/home' element={<Auth><HomePage/></Auth>}/>
+              <Route path='/message' element={<Auth><MessagePage/></Auth>}/>
+              <Route path='/message/:roomid' element={<Auth><MessagePage/></Auth>}/>
               <Route path='/network' element={<Auth><Network/></Auth>}/>
               <Route path='/jobs'element={<Auth><Jobs/></Auth>}/>
+              <Route path='/search'element={<Auth><SearchPage/></Auth>}/>
+              <Route path='/search/:keyword'element={<Auth><SearchPage/></Auth>}/>
+              <Route path='/search/hashtag/:keyword'element={<Auth><SearchPage/></Auth>}/>
+              <Route path='/notifications'element={<Auth><NotificationPage/></Auth>}/>
               <Route path='/profile/:id'element={<Auth><ProfilePage/></Auth>}/>
             </Routes>
           </RefetchUserProvider>

@@ -34,6 +34,14 @@ export default function Navbar() {
     }
   }
 
+  function navigateSearch() {
+    if(search){
+        navigate(`/search/${search}`)
+    }else{
+        alert("Insert keyword to be search!")
+    }
+  }
+
   return (
     <div className='nav-container z-index-2 bg-white'>
         <div className='left'>
@@ -41,8 +49,8 @@ export default function Navbar() {
                 <Link to={"/register"}><img src={logo} alt="img" className='logo'/></Link>
             </div>
             <div className='search-container'>
-                <input className='search' placeholder='search'/>
-                <button className='search-btn'>
+                <input className='search' placeholder='search' onChange={(e)=>{setSearch(e.target.value)}}/>
+                <button className='search-btn' onClick={navigateSearch}>
                     <AiOutlineSearch size={15}/>
                 </button>
             </div>
@@ -70,7 +78,7 @@ export default function Navbar() {
                 <span>Message</span>
             </NavLink>
             
-            <NavLink to={'/notification'} className={handlePage}>
+            <NavLink to={'/notifications'} className={handlePage}>
                 <MdNotifications size={logoSize}/>
                 <span>Notifications</span>  
             </NavLink>

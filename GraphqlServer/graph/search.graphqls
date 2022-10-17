@@ -1,0 +1,12 @@
+type Search {
+    Users: [User!]!
+    Posts: [Post!]!
+}
+
+extend type Query {
+    Search(keyword: String!, limit: Int!, offset:Int!): Search!
+    SearchConnectedUser(keyword: String!, userID: String!): [User!]!
+    SearchUser(keyword: String!, limit: Int!, offset: Int!, currUserID: String!): [User!]!
+    SearchPost(keyword: String!, limit: Int!, offset:Int!): [Post!]!
+    SearchHashtag(keyword: String!, limit: Int!, offset:Int!): [Post!]!
+}
